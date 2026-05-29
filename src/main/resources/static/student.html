@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student – EduPlatform</title>
+<style>
+  :root {
+    --primary: #4f46e5; --primary-dark: #3730a3; --primary-light: #ede9fe;
+    --success: #10b981; --danger: #ef4444; --warning: #f59e0b;
+    --bg: #f8fafc; --card: #ffffff; --text: #1e293b;
+    --muted: #64748b; --border: #e2e8f0;
+    --radius: 12px; --shadow: 0 2px 16px rgba(0,0,0,0.07);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* NAV */
+  nav { background: var(--card); border-bottom: 1px solid var(--border); padding: .8rem 2rem; display: flex; align-items: center; gap: 1rem; position: sticky; top: 0; z-index: 10; }
+  nav .brand { font-weight: 800; font-size: 1.1rem; color: var(--primary); margin-right: auto; text-decoration: none; }
+  nav a { color: var(--muted); text-decoration: none; font-size: .9rem; }
+  nav a:hover { color: var(--primary); }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 2rem 1rem; }
+  h1 { font-size: 1.7rem; font-weight: 800; margin-bottom: 1.5rem; }
+
+  /* CARD */
+  .card { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1.2rem; box-shadow: var(--shadow); }
+
+  /* TABS */
+  .tabs { display: flex; gap: .4rem; margin-bottom: 1.5rem; background: var(--card); padding: .4rem; border-radius: 10px; border: 1px solid var(--border); }
+  .tab { flex: 1; padding: .55rem .5rem; border-radius: 7px; border: none; background: transparent; cursor: pointer; font-size: .88rem; font-weight: 600; color: var(--muted); transition: all .15s; }
+  .tab.active { background: var(--primary); color: #fff; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* FORM */
+  .form-group { margin-bottom: .8rem; }
+  label.form-label { display: block; font-size: .82rem; font-weight: 600; color: var(--muted); margin-bottom: .3rem; }
+  input, select { width: 100%; padding: .6rem .85rem; border: 1.5px solid var(--border); border-radius: 8px; font-size: .93rem; background: var(--bg); color: var(--text); transition: border-color .15s; }
+  input:focus, select:focus { outline: none; border-color: var(--primary); background: #fff; }
+
+  /* BUTTONS */
+  .btn { display: inline-flex; align-items: center; gap: .4rem; padding: .6rem 1.3rem; border-radius: 8px; border: none; cursor: pointer; font-size: .88rem; font-weight: 600; transition: all .15s; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover:not(:disabled) { background: var(--primary-dark); }
+  .btn-success { background: var(--success); color: #fff; }
+  .btn-sm { padding: .35rem .75rem; font-size: .8rem; }
+  .btn-full { width: 100%; justify-content: center; padding: .7rem; }
+
+  /* COURSE GRID */
+  .course-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; }
+  .course-card { background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 1.1rem; transition: all .2s; }
+  .course-card:hover { border-color: var(--primary); box-shadow: var(--shadow); }
+  .course-card h3 { font-size: .97rem; font-weight: 700; margin: .4rem 0 .25rem; }
+  .course-card .meta { font-size: .8rem; color: var(--muted); margin-bottom: .6rem; line-height: 1.5; }
+
+  /* BADGE */
+  .badge { display: inline-block; padding: .2rem .65rem; border-radius: 99px; font-size: .72rem; font-weight: 700; }
+  .badge-primary { background: var(--primary-light); color: var(--primary); }
+  .badge-success { background: #d1fae5; color: #065f46; }
+  .badge-warning { background: #fef3c7; color: #92400e; }
+  .badge-muted { background: var(--border); color: var(--muted); }
+
+  /* PROGRESS */
+  .progress-wrap { margin: .5rem 0; }
+  .progress-label { display: flex; justify-content: space-between; font-size: .78rem; color: var(--muted); margin-bottom: .3rem; }
+  .progress-bar { background: var(--border); border-radius: 99px; height: 7px; }
+  .progress-fill { height: 7px; border-radius: 99px; background: var(--success); transition: width .3s; }
+
+  /* SITUATIE TABLE */
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .6rem; margin: .6rem 0 .8rem; }
+  .stat-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: .6rem .8rem; text-align: center; }
+  .stat-box .val { font-size: 1.2rem; font-weight: 800; }
+  .stat-box .lbl { font-size: .72rem; color: var(--muted); margin-top: .1rem; }
+
+  /* MSG */
+  .msg { padding: .7rem 1rem; border-radius: 8px; font-size: .88rem; margin-bottom: .8rem; display: none; }
+  .msg-ok { background: #d1fae5; color: #065f46; display: block !important; }
+  .msg-err { background: #fee2e2; color: #991b1b; display: block !important; }
+
+  /* QUIZ */
+  .quiz-header { background: var(--primary-light); border-radius: 8px; padding: .7rem 1rem; margin-bottom: 1.2rem; font-size: .88rem; color: var(--primary); font-weight: 600; }
+  .quiz-q { margin-bottom: 1.3rem; }
+  .quiz-q .q-text { font-weight: 700; font-size: .95rem; margin-bottom: .7rem; padding-left: .3rem; }
+  .quiz-q label { display: flex; align-items: center; gap: .75rem; padding: .55rem .9rem; border-radius: 8px; border: 1.5px solid var(--border); background: var(--bg); cursor: pointer; font-size: .9rem; margin-bottom: .4rem; transition: all .15s; }
+  .quiz-q label:hover { border-color: var(--primary); background: var(--primary-light); }
+  .quiz-q input[type="radio"] { accent-color: var(--primary); width: 15px; height: 15px; flex-shrink: 0; }
+
+  /* FILTER ROW */
+  .filter-row { display: flex; gap: .7rem; margin-bottom: 1.2rem; align-items: center; }
+  .filter-row input { flex: 1; margin: 0; }
+
+  /* LOGIN */
+  .login-select-row { display: flex; gap: .7rem; align-items: stretch; }
+  .login-select-row select { flex: 1; }
+  .login-select-row .btn { flex-shrink: 0; }
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="brand">🎓 EduPlatform</a>
+  <a href="index.html">Acasă</a>
+</nav>
+
+<div class="container">
+  <h1>Zona Student</h1>
+
+  <!-- Login -->
+  <div class="card" id="loginSection">
+    <h2 style="margin-bottom:1rem">Selectează contul tău</h2>
+    <div class="login-select-row">
+      <select id="studentSelect"><option value="">-- Alege student --</option></select>
+      <button class="btn btn-primary" onclick="selectStudent()">Intră</button>
+    </div>
+    <p style="margin-top:.9rem;font-size:.85rem;color:var(--muted)">Nu ai cont? <a href="#" onclick="showPanel('register')" style="color:var(--primary)">Înregistrează-te</a></p>
+  </div>
+
+  <!-- Register -->
+  <div class="card" id="registerSection" style="display:none">
+    <h2 style="margin-bottom:1rem">Înregistrare Student</h2>
+    <div id="regMsg" class="msg"></div>
+    <div class="form-group"><label class="form-label">Nume complet</label><input id="regNume" placeholder="Ex: Ion Popescu"></div>
+    <div class="form-group"><label class="form-label">Email</label><input id="regEmail" type="email" placeholder="ion@mail.ro"></div>
+    <div class="form-group"><label class="form-label">Parolă</label><input id="regParola" type="password" placeholder="••••••••"></div>
+    <button class="btn btn-primary btn-full" onclick="register()">Creează cont</button>
+    <p style="margin-top:.8rem;font-size:.85rem;color:var(--muted)"><a href="#" onclick="showPanel('login')" style="color:var(--primary)">← Înapoi la login</a></p>
+  </div>
+
+  <!-- App -->
+  <div id="app" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;flex-wrap:wrap;gap:.5rem">
+      <span style="color:var(--muted);font-size:.9rem">Conectat ca: <strong id="studentName" style="color:var(--text)"></strong></span>
+      <button class="btn btn-sm" onclick="logout()" style="background:var(--border);color:var(--muted)">Deconectare</button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('cursuri')">📚 Cursuri</button>
+      <button class="tab" onclick="switchTab('myCursuri')">📋 Situația mea</button>
+      <button class="tab" onclick="switchTab('quiz')">🧠 Quiz</button>
+    </div>
+
+    <!-- CURSURI DISPONIBILE -->
+    <div class="panel active" id="tab-cursuri">
+      <div class="filter-row">
+        <input id="filterCategorie" placeholder="🔍 Filtrează după categorie..." oninput="loadCursuri()">
+      </div>
+      <div id="msgCursuri" class="msg"></div>
+      <div class="course-grid" id="gridCursuri"></div>
+    </div>
+
+    <!-- SITUATIA MEA -->
+    <div class="panel" id="tab-myCursuri">
+      <div id="gridMyCursuri"></div>
+    </div>
+
+    <!-- QUIZ -->
+    <div class="panel" id="tab-quiz">
+      <div class="card" style="margin-bottom:1rem">
+        <div class="login-select-row">
+          <select id="quizCursSelect"><option value="">-- Alege curs --</option></select>
+          <button class="btn btn-primary" onclick="loadQuiz()">Încarcă quiz</button>
+        </div>
+      </div>
+      <div id="quizContent"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentStudentId = null;
+
+  async function init() {
+    const res = await fetch('/api/studenti');
+    if (!res.ok) return;
+    const studenti = await res.json();
+    const sel = document.getElementById('studentSelect');
+    sel.innerHTML = '<option value="">-- Alege student --</option>';
+    studenti.forEach(s => {
+      const o = document.createElement('option');
+      o.value = s.id; o.textContent = s.nume + ' (' + s.email + ')';
+      sel.appendChild(o);
+    });
+  }
+
+  function showPanel(panel) {
+    document.getElementById('loginSection').style.display = panel === 'login' ? '' : 'none';
+    document.getElementById('registerSection').style.display = panel === 'register' ? '' : 'none';
+  }
+
+  async function register() {
+    const msg = document.getElementById('regMsg');
+    const btn = document.querySelector('#registerSection .btn-primary');
+    const body = { nume: v('regNume'), email: v('regEmail'), parola: v('regParola') };
+    if (!body.nume || !body.email || !body.parola) { showMsg(msg, 'Completează toate câmpurile.', true); return; }
+    btn.disabled = true; btn.textContent = 'Se încarcă...';
+    try {
+      const res = await fetch('/api/studenti', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+      if (res.ok) { showMsg(msg, 'Cont creat! Te poți autentifica acum.', false); await init(); showPanel('login'); }
+      else { showMsg(msg, 'Email deja existent sau eroare server.', true); }
+    } finally { btn.disabled = false; btn.textContent = 'Creează cont'; }
+  }
+
+  async function selectStudent() {
+    const id = parseInt(document.getElementById('studentSelect').value);
+    if (!id) return;
+    currentStudentId = id;
+    const res = await fetch('/api/studenti/' + id);
+    const s = await res.json();
+    document.getElementById('studentName').textContent = s.nume;
+    document.getElementById('loginSection').style.display = 'none';
+    document.getElementById('registerSection').style.display = 'none';
+    document.getElementById('app').style.display = '';
+    loadCursuri();
+    loadMyCursuri();
+    loadQuizCursuri();
+  }
+
+  function logout() {
+    currentStudentId = null;
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('loginSection').style.display = '';
+  }
+
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach((t, i) => {
+      t.classList.toggle('active', ['cursuri','myCursuri','quiz'][i] === name);
+    });
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    if (name === 'myCursuri') loadMyCursuri();
+  }
+
+  async function loadCursuri() {
+    const cat = v('filterCategorie');
+    const url = '/api/cursuri' + (cat ? '?categorie=' + encodeURIComponent(cat) : '');
+    const [cursRes, insRes] = await Promise.all([fetch(url), fetch('/api/inscrieri/student/' + currentStudentId)]);
+    const cursuri = await cursRes.json();
+    const inscrieri = await insRes.json();
+    const inscrisLa = new Set(inscrieri.map(i => i.cursId));
+    const grid = document.getElementById('gridCursuri');
+    grid.innerHTML = '';
+    if (cursuri.length === 0) { grid.innerHTML = '<p style="color:var(--muted)">Niciun curs găsit.</p>'; return; }
+    cursuri.forEach(c => {
+      const inscris = inscrisLa.has(c.id);
+      const div = document.createElement('div');
+      div.className = 'course-card';
+      div.innerHTML = `
+        <span class="badge badge-primary">${c.categorie}</span>
+        <h3>${c.titlu}</h3>
+        <p class="meta">${c.descriere || ''}<br>
+          <strong style="font-size:.9rem">${c.pret} RON</strong>
+          ${c.instructor ? ' · ' + c.instructor.nume : ''}
+        </p>
+        ${inscris
+          ? `<span class="badge badge-success">✓ Înscris</span>`
+          : `<button class="btn btn-primary btn-sm btn-full" style="margin-top:.3rem" onclick="inscriere(${c.id}, this)">Înscrie-te</button>`
+        }`;
+      grid.appendChild(div);
+    });
+  }
+
+  async function inscriere(cursId, btn) {
+    btn.disabled = true; btn.textContent = 'Se procesează...';
+    const msg = document.getElementById('msgCursuri');
+    const res = await fetch('/api/inscrieri', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ studentId: currentStudentId, cursId })
+    });
+    if (res.ok) { showMsg(msg, 'Înscris cu succes! 🎉', false); loadCursuri(); loadMyCursuri(); loadQuizCursuri(); }
+    else { showMsg(msg, 'Eroare la înscriere.', true); btn.disabled = false; btn.textContent = 'Înscrie-te'; }
+  }
+
+  async function loadMyCursuri() {
+    const [insRes] = await Promise.all([fetch('/api/inscrieri/student/' + currentStudentId)]);
+    const inscrieri = await insRes.json();
+    const grid = document.getElementById('gridMyCursuri');
+    if (inscrieri.length === 0) {
+      grid.innerHTML = '<div class="card" style="text-align:center;color:var(--muted);padding:2rem">Nu ești înscris la niciun curs încă.</div>';
+      return;
+    }
+    grid.innerHTML = '';
+    for (const ins of inscrieri) {
+      const cr = await fetch('/api/cursuri/' + ins.cursId);
+      const c = await cr.json();
+      const notaOk = ins.notaFinala >= 0;
+      const quizOk = ins.scorQuiz >= 0;
+      const div = document.createElement('div');
+      div.className = 'card';
+      div.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:.5rem">
+          <div>
+            <span class="badge badge-primary">${c.categorie}</span>
+            <h3 style="margin-top:.4rem;font-size:1rem">${c.titlu}</h3>
+            <p style="font-size:.8rem;color:var(--muted)">${c.instructor?.nume || ''}</p>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:.75rem;color:var(--muted)">Înscris din ${ins.dataInscriere}</div>
+          </div>
+        </div>
+        <div class="stat-grid" style="margin-top:.9rem">
+          <div class="stat-box">
+            <div class="val" style="color:var(--primary)">${ins.progres}%</div>
+            <div class="lbl">Progres</div>
+          </div>
+          <div class="stat-box">
+            <div class="val" style="color:${quizOk ? 'var(--success)' : 'var(--muted)'}">${quizOk ? ins.scorQuiz.toFixed(1) : '—'}</div>
+            <div class="lbl">Scor Quiz</div>
+          </div>
+          <div class="stat-box">
+            <div class="val" style="color:${notaOk ? (ins.notaFinala >= 5 ? 'var(--success)' : 'var(--danger)') : 'var(--muted)'}">${notaOk ? ins.notaFinala : '—'}</div>
+            <div class="lbl">Notă finală</div>
+          </div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-label"><span>Progres curs</span><span>${ins.progres}%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${ins.progres}%"></div></div>
+        </div>`;
+      grid.appendChild(div);
+    }
+  }
+
+  async function loadQuizCursuri() {
+    const res = await fetch('/api/inscrieri/student/' + currentStudentId);
+    const inscrieri = await res.json();
+    const sel = document.getElementById('quizCursSelect');
+    sel.innerHTML = '<option value="">-- Alege curs --</option>';
+    for (const ins of inscrieri) {
+      const cr = await fetch('/api/cursuri/' + ins.cursId);
+      const c = await cr.json();
+      const o = document.createElement('option');
+      o.value = c.id; o.textContent = c.titlu;
+      sel.appendChild(o);
+    }
+  }
+
+  async function loadQuiz() {
+    const cursId = document.getElementById('quizCursSelect').value;
+    if (!cursId) return;
+    const res = await fetch('/api/quizuri/' + cursId);
+    const container = document.getElementById('quizContent');
+    if (!res.ok) { container.innerHTML = '<div class="card" style="color:var(--muted);text-align:center;padding:2rem">Nu există quiz pentru acest curs.</div>'; return; }
+    const quiz = await res.json();
+    let html = `<div class="card"><div class="quiz-header">🧠 ${quiz.intrebari.length} întrebări &bull; Punctaj maxim: <strong>${quiz.punctajMaxim} puncte</strong></div>`;
+    quiz.intrebari.forEach((q, idx) => {
+      html += `<div class="quiz-q"><p class="q-text">${idx + 1}. ${q.text}</p>`;
+      q.varianteRaspuns.forEach((varianta, vi) => {
+        html += `<label><input type="radio" name="q${idx}" value="${vi}"><span>${varianta}</span></label>`;
+      });
+      html += `</div>`;
+    });
+    html += `<button class="btn btn-primary btn-full" style="margin-top:.5rem"
+      onclick="submitQuiz(${cursId}, ${quiz.intrebari.length}, ${quiz.punctajMaxim})">
+      Trimite răspunsurile
+    </button>
+    <div id="quizResult" style="margin-top:1rem"></div></div>`;
+    container.innerHTML = html;
+  }
+
+  function submitQuiz(cursId, numIntrebari, punctajMaxim) {
+    const raspunsuri = [];
+    for (let i = 0; i < numIntrebari; i++) {
+      const sel = document.querySelector(`input[name="q${i}"]:checked`);
+      raspunsuri.push(sel ? parseInt(sel.value) : -1);
+    }
+    fetch('/api/quizuri/' + cursId + '/sustine', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ studentId: currentStudentId, raspunsuri })
+    }).then(r => r.json()).then(data => {
+      const scor = data.scor;
+      const max = data.punctajMaxim || punctajMaxim;
+      const pct = Math.round((scor / max) * 100);
+      const ok = pct >= 50;
+      document.getElementById('quizResult').innerHTML =
+        `<div style="background:${ok?'#d1fae5':'#fee2e2'};color:${ok?'#065f46':'#991b1b'};padding:1.2rem;border-radius:10px;text-align:center">
+          <div style="font-size:2rem;margin-bottom:.4rem">${ok?'🎉':'😕'}</div>
+          <div style="font-size:1.2rem;font-weight:800">Scor: ${scor.toFixed(1)} / ${max}</div>
+          <div style="font-size:.9rem;margin-top:.3rem;opacity:.8">${pct}% — ${ok?'Felicitări, ai trecut quiz-ul!':'Mai încearcă, ai nevoie de 50% minim.'}</div>
+        </div>`;
+      loadMyCursuri();
+    });
+  }
+
+  function v(id) { return document.getElementById(id)?.value?.trim() || ''; }
+  function showMsg(el, txt, err) {
+    el.className = 'msg ' + (err ? 'msg-err' : 'msg-ok');
+    el.textContent = txt;
+    setTimeout(() => { el.className = 'msg'; el.textContent = ''; }, 4000);
+  }
+
+  init();
+</script>
+</body>
+</html>

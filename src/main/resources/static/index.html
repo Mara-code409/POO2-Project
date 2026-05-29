@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduPlatform</title>
+<style>
+  :root {
+    --primary: #4f46e5;
+    --primary-dark: #3730a3;
+    --secondary: #10b981;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --text: #1e293b;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --radius: 12px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+  .hero {
+    text-align: center;
+    max-width: 560px;
+  }
+  .logo {
+    width: 64px; height: 64px;
+    background: var(--primary);
+    border-radius: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: .5rem; }
+  .subtitle { color: var(--muted); font-size: 1.1rem; margin-bottom: 3rem; }
+  .cards {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .card {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2.5rem 2rem;
+    width: 220px;
+    cursor: pointer;
+    transition: all .2s;
+    text-decoration: none;
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  .card:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow);
+    transform: translateY(-4px);
+  }
+  .card .icon { font-size: 3rem; }
+  .card h2 { font-size: 1.2rem; font-weight: 700; }
+  .card p { color: var(--muted); font-size: .9rem; text-align: center; }
+  .card.student:hover { border-color: var(--primary); }
+  .card.instructor:hover { border-color: var(--secondary); }
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="logo">🎓</div>
+  <h1>EduPlatform</h1>
+  <p class="subtitle">Platforma de e-learning pentru studenti si instructori</p>
+  <div class="cards">
+    <a href="student.html" class="card student">
+      <span class="icon">📚</span>
+      <h2>Sunt Student</h2>
+      <p>Inscrie-te la cursuri, urmareste progresul si sustine quizuri</p>
+    </a>
+    <a href="instructor.html" class="card instructor">
+      <span class="icon">🧑‍🏫</span>
+      <h2>Sunt Instructor</h2>
+      <p>Gestioneaza cursuri, module, quizuri si note studenti</p>
+    </a>
+  </div>
+</div>
+</body>
+</html>

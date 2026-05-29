@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instructor – EduPlatform</title>
+<style>
+  :root {
+    --primary: #4f46e5; --primary-dark: #3730a3;
+    --secondary: #10b981; --secondary-dark: #059669;
+    --bg: #f8fafc; --card: #ffffff; --text: #1e293b;
+    --muted: #64748b; --border: #e2e8f0;
+    --danger: #ef4444; --warning: #f59e0b;
+    --radius: 12px; --shadow: 0 2px 16px rgba(0,0,0,0.07);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  nav {
+    background: var(--card); border-bottom: 1px solid var(--border);
+    padding: .9rem 2rem; display: flex; align-items: center; gap: 1rem;
+    position: sticky; top: 0; z-index: 50;
+  }
+  nav .brand { font-weight: 800; font-size: 1.1rem; color: var(--secondary); margin-right: auto; }
+  nav a { color: var(--muted); text-decoration: none; font-size: .92rem; }
+  nav a:hover { color: var(--primary); }
+
+  .container { max-width: 1060px; margin: 0 auto; padding: 2rem 1rem; }
+
+  .card { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); padding: 2rem; box-shadow: var(--shadow); margin-bottom: 1.5rem; }
+  .card h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 1.2rem; }
+
+  /* Login */
+  .login-wrap { min-height: calc(100vh - 60px); display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+  .login-card { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); padding: 2.5rem 2rem; box-shadow: var(--shadow); width: 100%; max-width: 420px; }
+  .login-card h2 { font-size: 1.35rem; font-weight: 800; margin-bottom: 1.5rem; text-align: center; }
+  .login-select-row { display: flex; gap: .7rem; align-items: flex-end; }
+  .login-select-row select { flex: 1; margin-bottom: 0; }
+
+  label.lbl { display: block; font-size: .82rem; font-weight: 600; color: var(--muted); margin-bottom: .3rem; }
+  input, select, textarea {
+    width: 100%; padding: .6rem .9rem; border: 1.5px solid var(--border);
+    border-radius: 8px; font-size: .93rem; margin-bottom: .9rem;
+    background: var(--card); color: var(--text); font-family: inherit;
+    transition: border-color .15s;
+  }
+  textarea { resize: vertical; min-height: 72px; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--secondary); box-shadow: 0 0 0 3px rgba(16,185,129,.12); }
+
+  .btn { padding: .6rem 1.3rem; border-radius: 8px; border: none; cursor: pointer; font-size: .9rem; font-weight: 600; transition: all .15s; display: inline-flex; align-items: center; gap: .4rem; }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-success { background: var(--secondary); color: #fff; }
+  .btn-success:hover { background: var(--secondary-dark); }
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-danger:hover { background: #dc2626; }
+  .btn-warning { background: var(--warning); color: #fff; }
+  .btn-warning:hover { background: #d97706; }
+  .btn-outline { background: transparent; color: var(--muted); border: 1.5px solid var(--border); }
+  .btn-outline:hover { border-color: var(--danger); color: var(--danger); }
+  .btn-sm { padding: .35rem .8rem; font-size: .82rem; border-radius: 6px; }
+  .btn:disabled { opacity: .6; cursor: not-allowed; }
+
+  .msg { padding: .75rem 1rem; border-radius: 8px; font-size: .88rem; font-weight: 500; margin-bottom: 1rem; display: none; }
+  .msg-ok  { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+  .msg-err { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+  .app-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+  .app-header .info { flex: 1; }
+  .app-header .info p { font-size: .88rem; color: var(--muted); margin-top: .1rem; }
+  .avatar { width: 46px; height: 46px; border-radius: 50%; background: linear-gradient(135deg, var(--secondary), var(--primary)); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 1.15rem; flex-shrink: 0; }
+
+  .tabs { display: flex; gap: .35rem; margin-bottom: 1.5rem; flex-wrap: wrap; background: var(--card); padding: .4rem; border-radius: 10px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+  .tab { padding: .55rem 1.1rem; border-radius: 7px; border: none; background: transparent; cursor: pointer; font-size: .88rem; font-weight: 600; color: var(--muted); transition: all .15s; white-space: nowrap; }
+  .tab:hover { background: var(--bg); color: var(--text); }
+  .tab.active { background: var(--secondary); color: #fff; box-shadow: 0 2px 8px rgba(16,185,129,.3); }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .course-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 1rem; }
+  .course-card { background: var(--bg); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 1.25rem; transition: border-color .15s; }
+  .course-card:hover { border-color: var(--secondary); }
+  .course-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: .25rem; }
+  .course-card .meta { font-size: .82rem; color: var(--muted); margin-bottom: .8rem; line-height: 1.6; }
+  .badge { display: inline-block; padding: .2rem .65rem; border-radius: 99px; font-size: .74rem; font-weight: 700; background: #d1fae5; color: #065f46; margin-bottom: .45rem; }
+  .btn-row { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .6rem; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1rem; }
+  .form-grid .full { grid-column: 1 / -1; }
+
+  .curs-pick { margin-bottom: 1.2rem; }
+  .curs-pick select { margin-bottom: 0; }
+
+  /* Student / grade tables */
+  .data-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  .data-table th { text-align: left; padding: .65rem 1rem; background: var(--bg); border-bottom: 2px solid var(--border); font-weight: 700; color: var(--muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
+  .data-table td { padding: .65rem 1rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: #f8fafc; }
+
+  .pill { display: inline-flex; align-items: center; padding: .22rem .65rem; border-radius: 99px; font-size: .8rem; font-weight: 700; }
+  .pill-good   { background: #d1fae5; color: #065f46; }
+  .pill-medium { background: #fef3c7; color: #92400e; }
+  .pill-bad    { background: #fee2e2; color: #991b1b; }
+  .pill-none   { background: #f1f5f9; color: var(--muted); }
+
+  .progress-bar { height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; width: 80px; display: inline-block; vertical-align: middle; }
+  .progress-bar-fill { height: 100%; background: var(--secondary); border-radius: 99px; }
+
+  .nota-row { display: flex; gap: .5rem; align-items: center; }
+  .nota-row input { width: 80px; margin: 0; padding: .38rem .65rem; font-size: .86rem; }
+
+  .empty { text-align: center; padding: 2.5rem 1rem; color: var(--muted); }
+  .empty .icon { font-size: 2.8rem; margin-bottom: .6rem; }
+  .empty p { font-size: .92rem; }
+
+  /* Modal */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; align-items: center; justify-content: center; z-index: 100; padding: 1rem; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--card); border-radius: var(--radius); padding: 2rem; width: 100%; max-width: 540px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,.2); }
+  .modal > h2 { font-size: 1.1rem; font-weight: 800; margin-bottom: 1.2rem; padding-right: 2rem; }
+  .modal-close { float: right; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--muted); margin-top: -.2rem; }
+  .modal-close:hover { color: var(--danger); }
+
+  /* Quiz builder */
+  .quiz-q { border: 1.5px solid var(--border); border-radius: 10px; padding: 1rem; margin-bottom: .75rem; background: var(--bg); }
+  .quiz-q h4 { font-size: .85rem; font-weight: 700; color: var(--muted); margin-bottom: .6rem; }
+  .opt-row { display: flex; align-items: center; gap: .55rem; margin-bottom: .4rem; }
+  .opt-row input[type="text"] { flex: 1; margin: 0; padding: .42rem .7rem; font-size: .88rem; }
+  .opt-row label { display: flex; align-items: center; gap: .3rem; white-space: nowrap; font-size: .82rem; color: var(--muted); font-weight: 600; cursor: pointer; flex-shrink: 0; }
+  .opt-row label input[type="radio"] { width: auto; margin: 0; accent-color: var(--secondary); }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="brand">🎓 EduPlatform</span>
+  <a href="index.html">Acasă</a>
+</nav>
+
+<!-- ===== LOGIN WRAP ===== -->
+<div id="loginWrap" class="login-wrap">
+  <div style="width:100%;max-width:420px">
+
+    <!-- Login card -->
+    <div class="login-card" id="loginCard">
+      <h2>👨‍🏫 Zona Instructor</h2>
+      <label class="lbl">Contul tău</label>
+      <div class="login-select-row">
+        <select id="instrSelect"><option value="">— Alege instructor —</option></select>
+        <button class="btn btn-success" onclick="selectInstructor()">Intră</button>
+      </div>
+      <p style="margin-top:1.3rem;text-align:center;font-size:.9rem;color:var(--muted)">
+        Nu ai cont?
+        <a href="#" onclick="showPanel('register')" style="color:var(--secondary);font-weight:600">Înregistrează-te</a>
+      </p>
+    </div>
+
+    <!-- Register card -->
+    <div class="login-card" id="registerCard" style="display:none">
+      <h2>✍️ Înregistrare Instructor</h2>
+      <div id="regMsg" class="msg"></div>
+      <label class="lbl">Nume complet</label>
+      <input id="regNume" placeholder="Ex: Prof. Ion Popescu">
+      <label class="lbl">Email</label>
+      <input id="regEmail" type="email" placeholder="email@edu.ro">
+      <label class="lbl">Parolă</label>
+      <input id="regParola" type="password" placeholder="••••••••">
+      <label class="lbl">Specializare</label>
+      <input id="regSpec" placeholder="Ex: Informatică">
+      <button class="btn btn-success" style="width:100%" id="regBtn" onclick="register()">Creează cont</button>
+      <p style="margin-top:1rem;text-align:center;font-size:.9rem;color:var(--muted)">
+        <a href="#" onclick="showPanel('login')" style="color:var(--secondary);font-weight:600">← Înapoi la login</a>
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== APP ===== -->
+<div id="app" style="display:none">
+  <div class="container">
+
+    <!-- Header -->
+    <div class="app-header">
+      <div class="avatar" id="avatarEl">I</div>
+      <div class="info">
+        <strong id="instrName">Instructor</strong>
+        <p>Instructor · EduPlatform</p>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="logout()">⬅ Deconectare</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('cursuri')">📚 Cursurile mele</button>
+      <button class="tab" onclick="switchTab('adauga')">➕ Adaugă curs</button>
+      <button class="tab" onclick="switchTab('studenti')">👥 Studenți înscriși</button>
+      <button class="tab" onclick="switchTab('note')">📝 Acordare note</button>
+    </div>
+
+    <!-- ── Cursurile mele ── -->
+    <div class="panel active" id="tab-cursuri">
+      <div id="msgCursuri" class="msg"></div>
+      <div id="gridCursuri" class="course-grid"></div>
+    </div>
+
+    <!-- ── Adaugă curs ── -->
+    <div class="panel" id="tab-adauga">
+      <div class="card">
+        <h2>Curs nou</h2>
+        <div id="msgAdauga" class="msg"></div>
+        <div class="form-grid">
+          <div class="full">
+            <label class="lbl">Titlu curs *</label>
+            <input id="newTitlu" placeholder="Ex: Introducere în Java">
+          </div>
+          <div class="full">
+            <label class="lbl">Descriere</label>
+            <textarea id="newDescriere" placeholder="Despre ce este cursul..."></textarea>
+          </div>
+          <div>
+            <label class="lbl">Categorie</label>
+            <input id="newCategorie" placeholder="Ex: Programare">
+          </div>
+          <div>
+            <label class="lbl">Preț (RON)</label>
+            <input id="newPret" type="number" min="0" placeholder="0">
+          </div>
+        </div>
+        <button class="btn btn-success" id="btnAdauga" onclick="adaugareCurs()">➕ Adaugă cursul</button>
+      </div>
+    </div>
+
+    <!-- ── Studenți înscriși ── -->
+    <div class="panel" id="tab-studenti">
+      <div class="card">
+        <h2>👥 Studenți înscriși</h2>
+        <div class="curs-pick">
+          <label class="lbl">Selectează cursul</label>
+          <select id="cursStudentiSel" onchange="loadStudentiLaCurs()">
+            <option value="">— Alege curs —</option>
+          </select>
+        </div>
+        <div id="tabelStudenti">
+          <div class="empty"><div class="icon">📋</div><p>Selectează un curs pentru a vedea studenții înscriși.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Acordare note ── -->
+    <div class="panel" id="tab-note">
+      <div class="card">
+        <h2>📝 Acordare note finale</h2>
+        <div class="curs-pick">
+          <label class="lbl">Selectează cursul</label>
+          <select id="cursNoteSel" onchange="loadInscrieriPentruNote()">
+            <option value="">— Alege curs —</option>
+          </select>
+        </div>
+        <div id="tabelNote">
+          <div class="empty"><div class="icon">✏️</div><p>Selectează un curs pentru a acorda note.</p></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /container -->
+</div><!-- /app -->
+
+<!-- ===== MODAL: Module + Quiz ===== -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modalBox">
+    <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    <h2 id="modalTitle">Gestionare curs</h2>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+let currentInstrId = null;
+let currentCursId  = null;
+let intrebariCount = 0;
+
+// ── Init: populează lista instructori ──
+async function init() {
+  const res  = await fetch('/api/instructori');
+  const list = await res.json();
+  const sel  = document.getElementById('instrSelect');
+  list.forEach(i => {
+    const o = document.createElement('option');
+    o.value = i.id;
+    o.textContent = i.nume + ' (' + i.email + ')';
+    sel.appendChild(o);
+  });
+}
+
+// ── Panou login / register ──
+function showPanel(p) {
+  document.getElementById('loginCard').style.display    = p === 'login'    ? '' : 'none';
+  document.getElementById('registerCard').style.display = p === 'register' ? '' : 'none';
+}
+
+async function register() {
+  const msg  = document.getElementById('regMsg');
+  const btn  = document.getElementById('regBtn');
+  const body = {
+    nume: v('regNume'), email: v('regEmail'),
+    parola: v('regParola'), specializare: v('regSpec')
+  };
+  if (!body.nume || !body.email || !body.parola) {
+    showMsg(msg, 'Completează toate câmpurile obligatorii.', true); return;
+  }
+  btn.disabled = true; btn.textContent = 'Se încarcă...';
+  try {
+    const res = await fetch('/api/instructori', {
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body)
+    });
+    if (res.ok) {
+      showMsg(msg, '✅ Cont creat! Te poți autentifica.', false);
+      await init();
+      setTimeout(() => showPanel('login'), 1600);
+    } else {
+      showMsg(msg, '❌ Email deja existent sau eroare server.', true);
+    }
+  } finally {
+    btn.disabled = false; btn.textContent = 'Creează cont';
+  }
+}
+
+async function selectInstructor() {
+  const id = parseInt(document.getElementById('instrSelect').value);
+  if (!id) return;
+  currentInstrId = id;
+  const res  = await fetch('/api/instructori');
+  const list = await res.json();
+  const instr = list.find(i => i.id === id);
+  const name  = instr ? instr.nume : 'Instructor';
+  document.getElementById('instrName').textContent  = name;
+  document.getElementById('avatarEl').textContent   = name.charAt(0).toUpperCase();
+  document.getElementById('loginWrap').style.display = 'none';
+  document.getElementById('app').style.display       = '';
+  loadMyCursuri();
+}
+
+function logout() {
+  currentInstrId = null;
+  currentCursId  = null;
+  document.getElementById('app').style.display       = 'none';
+  document.getElementById('loginWrap').style.display = 'flex';
+  showPanel('login');
+  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === 0));
+  document.querySelectorAll('.panel').forEach((p, i) => p.classList.toggle('active', i === 0));
+}
+
+// ── Tab switching ──
+function switchTab(name) {
+  const names = ['cursuri','adauga','studenti','note'];
+  document.querySelectorAll('.tab').forEach((t, i) =>
+    t.classList.toggle('active', names[i] === name));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'studenti' || name === 'note') populateCursSelects();
+}
+
+// ── Cursurile mele ──
+async function loadMyCursuri() {
+  const res  = await fetch('/api/cursuri');
+  const all  = await res.json();
+  const mine = all.filter(c => c.instructor?.id === currentInstrId);
+  const grid = document.getElementById('gridCursuri');
+  grid.innerHTML = '';
+  if (mine.length === 0) {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1">
+      <div class="icon">📭</div>
+      <p>Nu ai adăugat niciun curs încă.<br>
+      <a href="#" onclick="switchTab('adauga')" style="color:var(--secondary);font-weight:600">Adaugă primul tău curs →</a></p>
+    </div>`;
+    return;
+  }
+  mine.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'course-card';
+    div.innerHTML = `
+      <span class="badge">${esc(c.categorie || 'General')}</span>
+      <h3>${esc(c.titlu)}</h3>
+      <p class="meta">${esc(c.descriere || '')}<br><strong>${c.pret} RON</strong></p>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" onclick="openModal(${c.id},'${escQ(c.titlu)}')">📦 Module / Quiz</button>
+        <button class="btn btn-danger btn-sm"  onclick="stergeCurs(${c.id})">🗑 Șterge</button>
+      </div>`;
+    grid.appendChild(div);
+  });
+}
+
+async function adaugareCurs() {
+  const msg = document.getElementById('msgAdauga');
+  const btn = document.getElementById('btnAdauga');
+  const body = {
+    titlu: v('newTitlu'), descriere: v('newDescriere'),
+    instructorId: currentInstrId, categorie: v('newCategorie'),
+    pret: parseFloat(v('newPret')) || 0
+  };
+  if (!body.titlu) { showMsg(msg, '❌ Titlul este obligatoriu.', true); return; }
+  btn.disabled = true; btn.textContent = 'Se adaugă...';
+  try {
+    const res = await fetch('/api/cursuri', {
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body)
+    });
+    if (res.ok) {
+      showMsg(msg, '✅ Curs adăugat cu succes!', false);
+      ['newTitlu','newDescriere','newCategorie','newPret'].forEach(id =>
+        document.getElementById(id).value = '');
+      loadMyCursuri();
+    } else {
+      showMsg(msg, '❌ Eroare la adăugare curs.', true);
+    }
+  } finally {
+    btn.disabled = false; btn.textContent = '➕ Adaugă cursul';
+  }
+}
+
+async function stergeCurs(id) {
+  if (!confirm('Ștergi cursul? Acțiunea este ireversibilă.')) return;
+  const res = await fetch('/api/cursuri/' + id, { method: 'DELETE' });
+  const msg = document.getElementById('msgCursuri');
+  if (res.ok) { showMsg(msg, '✅ Curs șters.', false); loadMyCursuri(); }
+  else         { showMsg(msg, '❌ Eroare la ștergere.', true); }
+}
+
+// ── Populează select-uri cursuri ──
+async function populateCursSelects() {
+  const res  = await fetch('/api/cursuri');
+  const all  = await res.json();
+  const mine = all.filter(c => c.instructor?.id === currentInstrId);
+  ['cursStudentiSel','cursNoteSel'].forEach(selId => {
+    const sel  = document.getElementById(selId);
+    const prev = sel.value;
+    sel.innerHTML = '<option value="">— Alege curs —</option>';
+    mine.forEach(c => {
+      const o = document.createElement('option');
+      o.value = c.id; o.textContent = c.titlu;
+      sel.appendChild(o);
+    });
+    if (prev) sel.value = prev;
+  });
+}
+
+// ── Studenți înscriși (cu progres + scor quiz + notă) ──
+async function loadStudentiLaCurs() {
+  const cursId = document.getElementById('cursStudentiSel').value;
+  const div    = document.getElementById('tabelStudenti');
+  if (!cursId) {
+    div.innerHTML = `<div class="empty"><div class="icon">📋</div><p>Selectează un curs.</p></div>`;
+    return;
+  }
+  const [insRes, studRes] = await Promise.all([
+    fetch('/api/inscrieri/curs/' + cursId),
+    fetch('/api/cursuri/'  + cursId + '/studenti')
+  ]);
+  const inscrieri = await insRes.json();
+  const studenti  = await studRes.json();
+
+  if (inscrieri.length === 0) {
+    div.innerHTML = `<div class="empty"><div class="icon">👤</div><p>Niciun student înscris la acest curs.</p></div>`;
+    return;
+  }
+
+  const rows = inscrieri.map(ins => {
+    const st    = studenti.find(s => s.id === ins.studentId);
+    const nume  = st ? esc(st.nume)  : 'Student #' + ins.studentId;
+    const email = st ? esc(st.email) : '—';
+    const prog  = ins.progres  ?? 0;
+    const scor  = ins.scorQuiz ?? -1;
+    const nota  = ins.notaFinala ?? -1;
+
+    // progres bar
+    const barHtml = `<div style="display:flex;align-items:center;gap:.55rem">
+      <div class="progress-bar"><div class="progress-bar-fill" style="width:${prog}%"></div></div>
+      <span style="font-size:.82rem;color:var(--muted)">${prog}%</span>
+    </div>`;
+
+    // scor quiz pill
+    let scorHtml;
+    if (scor < 0) {
+      scorHtml = `<span class="pill pill-none">—</span>`;
+    } else {
+      const cls = scor >= 7 ? 'good' : scor >= 4 ? 'medium' : 'bad';
+      scorHtml  = `<span class="pill pill-${cls}">${scor.toFixed(1)} pct</span>`;
+    }
+
+    // notă finală pill
+    let notaHtml;
+    if (nota < 0) {
+      notaHtml = `<span class="pill pill-none">Neacordată</span>`;
+    } else {
+      const cls = nota >= 7 ? 'good' : nota >= 5 ? 'medium' : 'bad';
+      notaHtml  = `<span class="pill pill-${cls}">${nota.toFixed(1)}</span>`;
+    }
+
+    return `<tr>
+      <td>
+        <strong>${nume}</strong>
+        <br><span style="font-size:.8rem;color:var(--muted)">${email}</span>
+      </td>
+      <td>${barHtml}</td>
+      <td>${scorHtml}</td>
+      <td>${notaHtml}</td>
+    </tr>`;
+  }).join('');
+
+  div.innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Student</th>
+        <th>Progres</th>
+        <th>Scor Quiz</th>
+        <th>Notă finală</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+// ── Acordare note ──
+async function loadInscrieriPentruNote() {
+  const cursId = document.getElementById('cursNoteSel').value;
+  const div    = document.getElementById('tabelNote');
+  if (!cursId) {
+    div.innerHTML = `<div class="empty"><div class="icon">✏️</div><p>Selectează un curs.</p></div>`;
+    return;
+  }
+  const [insRes, studRes] = await Promise.all([
+    fetch('/api/inscrieri/curs/' + cursId),
+    fetch('/api/cursuri/'  + cursId + '/studenti')
+  ]);
+  const inscrieri = await insRes.json();
+  const studenti  = await studRes.json();
+
+  if (inscrieri.length === 0) {
+    div.innerHTML = `<div class="empty"><div class="icon">👤</div><p>Niciun student înscris.</p></div>`;
+    return;
+  }
+
+  const rows = inscrieri.map(ins => {
+    const st   = studenti.find(s => s.id === ins.studentId);
+    const nume = st ? esc(st.nume) : 'Student #' + ins.studentId;
+    const nota = ins.notaFinala ?? -1;
+    const scor = ins.scorQuiz   ?? -1;
+    const scorStr = scor >= 0 ? `Quiz: ${scor.toFixed(1)} pct` : 'Quiz: —';
+
+    return `<tr>
+      <td>
+        <strong>${nume}</strong>
+        <br><span style="font-size:.8rem;color:var(--muted)">${scorStr}</span>
+      </td>
+      <td>${ins.progres ?? 0}%</td>
+      <td>${nota >= 0 ? `<strong>${nota.toFixed(1)}</strong>` : '<span style="color:var(--muted)">—</span>'}</td>
+      <td>
+        <div class="nota-row">
+          <input type="number" min="1" max="10" step="0.1"
+                 id="nota-${ins.id}" placeholder="1–10"
+                 value="${nota >= 0 ? nota : ''}">
+          <button class="btn btn-success btn-sm" onclick="setNota(${ins.id})">✓</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  div.innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Student</th>
+        <th>Progres</th>
+        <th>Notă curentă</th>
+        <th>Setează notă</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+async function setNota(inscriereId) {
+  const nota = parseFloat(document.getElementById('nota-' + inscriereId).value);
+  if (isNaN(nota) || nota < 1 || nota > 10) { alert('Introdu o notă validă (1–10).'); return; }
+  const res = await fetch('/api/inscrieri/' + inscriereId + '/nota', {
+    method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ nota })
+  });
+  if (res.ok) loadInscrieriPentruNote();
+  else alert('Eroare la salvare notă.');
+}
+
+// ── Modal: Module + Quiz ──
+async function openModal(cursId, titlu) {
+  currentCursId = cursId;
+  intrebariCount = 0;
+  document.getElementById('modalTitle').textContent = titlu;
+  document.getElementById('modalOverlay').classList.add('open');
+  await renderModalBody(cursId);
+}
+
+async function renderModalBody(cursId) {
+  const [modRes, quizRes] = await Promise.all([
+    fetch('/api/cursuri/' + cursId + '/module'),
+    fetch('/api/quizuri/' + cursId)
+  ]);
+  const module  = await modRes.json();
+  const hasQuiz = quizRes.ok;
+  const quiz    = hasQuiz ? await quizRes.json() : null;
+
+  // ── Module section ──
+  let html = `<p style="font-size:.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.6rem">Module</p>`;
+
+  if (module.length === 0) {
+    html += `<p style="color:var(--muted);font-size:.88rem;font-style:italic;margin-bottom:.7rem">Niciun modul adăugat.</p>`;
+  } else {
+    module.forEach(m => {
+      html += `<div style="display:flex;justify-content:space-between;align-items:center;
+                            padding:.5rem .75rem;border-radius:7px;background:var(--bg);
+                            margin-bottom:.35rem;border:1px solid var(--border)">
+        <span style="font-weight:600;font-size:.9rem">📄 ${esc(m.titlu)}</span>
+        <span style="color:var(--muted);font-size:.8rem">${m.durata} min</span>
+      </div>`;
+    });
+  }
+
+  html += `<div style="border:1px solid var(--border);border-radius:9px;padding:.9rem;margin:.9rem 0 1.3rem">
+    <p style="font-size:.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.6rem">Adaugă modul nou</p>
+    <input id="modTitlu" placeholder="Titlu modul" style="margin-bottom:.5rem">
+    <textarea id="modContinut" placeholder="Conținut / descriere" style="min-height:48px;margin-bottom:.5rem"></textarea>
+    <div style="display:flex;gap:.7rem;align-items:flex-end">
+      <div style="flex:1"><input id="modDurata" type="number" placeholder="Durată (min)" style="margin:0"></div>
+      <button class="btn btn-primary btn-sm" onclick="adaugaModul(${cursId})">Adaugă</button>
+    </div>
+  </div>`;
+
+  // ── Quiz section ──
+  html += `<p style="font-size:.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.6rem">Quiz</p>`;
+
+  if (hasQuiz && quiz) {
+    html += `<div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:9px;padding:.85rem 1rem">
+      <p style="color:#065f46;font-weight:700;font-size:.92rem">✅ Quiz configurat</p>
+      <p style="color:#065f46;font-size:.85rem;margin-top:.2rem">${quiz.intrebari.length} întrebări · Punctaj maxim: ${quiz.punctajMaxim} pct</p>
+    </div>`;
+  } else {
+    html += `<div id="intrebariList"></div>
+      <button class="btn btn-warning btn-sm" onclick="addIntrebareForm()" style="margin-bottom:.9rem">+ Adaugă întrebare</button>
+      <div style="display:flex;gap:.8rem;align-items:flex-end;flex-wrap:wrap">
+        <div>
+          <label style="font-size:.8rem;font-weight:600;color:var(--muted);display:block;margin-bottom:.3rem">Punctaj maxim</label>
+          <input id="quizPunctaj" type="number" value="10" style="width:110px;margin:0">
+        </div>
+        <button class="btn btn-success btn-sm" onclick="salveazaQuiz(${cursId})">💾 Salvează quiz</button>
+      </div>`;
+  }
+
+  document.getElementById('modalBody').innerHTML = html;
+}
+
+function addIntrebareForm() {
+  const idx = intrebariCount++;
+  const div = document.createElement('div');
+  div.className = 'quiz-q';
+  div.id = 'intrebare-' + idx;
+  div.innerHTML = `
+    <h4>Întrebarea ${idx + 1}</h4>
+    <input type="text" placeholder="Textul întrebării" id="iq-text-${idx}" style="margin-bottom:.55rem">
+    ${[0,1,2].map(vi => `
+      <div class="opt-row">
+        <input type="text" placeholder="Varianta ${vi+1}" id="iq-v${vi}-${idx}">
+        <label><input type="radio" name="correct-${idx}" value="${vi}"> Corectă</label>
+      </div>`).join('')}`;
+  document.getElementById('intrebariList').appendChild(div);
+}
+
+async function adaugaModul(cursId) {
+  const body = { titlu: v('modTitlu'), continut: v('modContinut'), durata: parseInt(v('modDurata')) || 0 };
+  if (!body.titlu) return;
+  await fetch('/api/cursuri/' + cursId + '/module', {
+    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body)
+  });
+  await renderModalBody(cursId);
+}
+
+async function salveazaQuiz(cursId) {
+  const intrebari = [];
+  for (let i = 0; i < intrebariCount; i++) {
+    const el = document.getElementById('intrebare-' + i);
+    if (!el) continue;
+    const text           = v('iq-text-' + i);
+    const varianteRaspuns = [v('iq-v0-' + i), v('iq-v1-' + i), v('iq-v2-' + i)].filter(s => s);
+    const sel            = el.querySelector(`input[name="correct-${i}"]:checked`);
+    const indexRaspunsCorect = sel ? parseInt(sel.value) : 0;
+    if (text && varianteRaspuns.length > 0)
+      intrebari.push({ text, varianteRaspuns, indexRaspunsCorect });
+  }
+  if (intrebari.length === 0) { alert('Adaugă cel puțin o întrebare.'); return; }
+  const punctajMaxim = parseInt(v('quizPunctaj')) || 10;
+  await fetch('/api/quizuri/' + cursId, {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ punctajMaxim, intrebari })
+  });
+  intrebariCount = 0;
+  await renderModalBody(cursId);
+}
+
+function closeModal(e)  { if (e.target === document.getElementById('modalOverlay')) closeModalDirect(); }
+function closeModalDirect() { document.getElementById('modalOverlay').classList.remove('open'); intrebariCount = 0; }
+
+// ── Utils ──
+function v(id) { return document.getElementById(id)?.value?.trim() || ''; }
+function esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+function escQ(s) { return (s || '').replace(/'/g, "&#39;"); }
+function showMsg(el, txt, err) {
+  el.className = 'msg ' + (err ? 'msg-err' : 'msg-ok');
+  el.textContent = txt; el.style.display = '';
+  setTimeout(() => { el.style.display = 'none'; }, 4000);
+}
+
+init();
+</script>
+</body>
+</html>
